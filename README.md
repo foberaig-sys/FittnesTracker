@@ -27,48 +27,29 @@ geladen und danach zwischengespeichert.
 
 Übungsdaten & Bilder: [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (Public Domain / Unlicense).
 
-## Projektstruktur
+## Aufbau
 
-```
-src/app/            Screens (Expo Router)
-  index.tsx         Startseite: Woche, heutiges Training, Statistik, Wochenplan
-  workout.tsx       Laufendes Training
-  day/[date].tsx    Rückblick auf einen Tag
-  plan/[day].tsx    Plan für einen Wochentag bearbeiten
-  exercises.tsx     Übungsbibliothek / Auswahl
-  exercise/[id].tsx Übungsdetails
-  log/[id].tsx      Trainingszusammenfassung
-src/components/     UI-Bausteine
-src/data/           Übungsdatenbank, deutsche Namen, Vorlagen
-src/lib/            Datums- und Statistikfunktionen
-src/store/          App-Zustand + Speicherung
-```
+Die komplette App steckt in **einer Datei: `App.js`**. So kann sie direkt in Snack eingefügt werden.
+Die Übungsdatenbank (876 Übungen) lädt die App beim ersten Start aus dem Internet und speichert sie
+danach auf dem Gerät.
 
 ---
 
-## 1. Testen mit Expo Go
+## 1. Testen mit Snack + Expo Go
 
 1. **Expo Go** aus dem App Store aufs iPhone laden.
-2. Am Computer (Node.js installiert):
-   ```bash
-   npm install
-   npx expo start
-   ```
-3. QR-Code mit der iPhone-Kamera scannen → App öffnet sich in Expo Go.
-   (iPhone und Computer müssen im selben WLAN sein, sonst `npx expo start --tunnel`.)
+2. https://snack.expo.dev öffnen, unten SDK **55** einstellen.
+3. Den kompletten Inhalt von [`App.js`](App.js) kopieren (auf GitHub: Datei öffnen → „Copy raw file“)
+   und den Inhalt der `App.js` im Snack damit ersetzen.
+4. Fragt Snack nach fehlenden Paketen („Add dependency“), jeweils hinzufügen.
+5. Rechts **„My Device“** → QR-Code mit der iPhone-Kamera scannen.
 
-### Alternativ über Snack (ohne Computer-Setup)
+### Alternativ lokal
 
-https://snack.expo.dev → links bei „Project“ auf **⋮** → **„Import git repository“** →
-`https://github.com/foberaig-sys/FittnesTracker` eintragen → **„Show advanced options“** →
-Branch **`snack`** eintragen → importieren → unten SDK **55** wählen → rechts **„My Device“** →
-QR-Code mit dem iPhone scannen.
-
-Der Branch `snack` ist eine abgespeckte Kopie von `main` (ohne Bilder, Lockfile und Tooling),
-damit der Snack-Import funktioniert. Er wird mit `scripts/make-snack-branch.sh` aus `main` erzeugt.
-
-> Expo Go im App Store unterstützt nur die aktuelle SDK-Version. Verlangt Expo Go eine neuere SDK:
-> `npx expo install expo@latest --fix`.
+```bash
+npm install
+npx expo start        # QR-Code mit der iPhone-Kamera scannen
+```
 
 ## 2. Auf das eigene iPhone installieren (Apple Developer Program)
 
@@ -108,5 +89,4 @@ TestFlight-App installieren.
 
 ```bash
 npm run lint        # ESLint
-npm run typecheck   # TypeScript
 ```
