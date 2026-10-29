@@ -19,6 +19,7 @@ fs.writeFileSync("app.json", JSON.stringify({ expo: rest }, null, 2) + "\n");
 '
 git add -A
 git commit -qm "Snack-Version aus main ($(git -C "$root" rev-parse --short main))"
-git -C "$root" branch -f snack HEAD
+sha=$(git rev-parse HEAD)
+git -C "$root" branch -f snack "$sha"
 cd "$root" && git worktree remove --force "$tmp"
 echo "Branch snack aktualisiert."
