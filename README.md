@@ -1,80 +1,107 @@
-# FittnesTracker
+# GymTracker
 
-Einfache Fitness-App (Expo / React Native, SDK 58) zum Protokollieren von Trainings.
+Ein bewusst simpler Gym-Tracker (Expo / React Native, SDK 58, Expo Router).
 
-- **Heute** – Übung, Sätze, Wiederholungen und Gewicht (bzw. km bei „Laufen“) eintragen
-- **Verlauf** – alle Trainings nach Tagen gruppiert (lange drücken = löschen)
-- **Statistik** – Serie, Trainingstage, Volumen, gelaufene km, häufigste Übungen
+## Funktionen
 
-Daten werden lokal auf dem Gerät gespeichert (AsyncStorage).
+- **Wochenansicht oben** – Mo–So mit dem geplanten Training pro Tag. Erledigte Tage werden grün.
+  Mit den Pfeilen blätterst du in vergangene Wochen. Tippe auf einen Tag, um zu sehen,
+  was du dort trainiert hast – inkl. Gewicht und Wiederholungen pro Satz.
+- **Wochenplan** – pro Wochentag ein Training (z. B. „Leg Day“) mit Übungen und Satzanzahl.
+  Der Plan gilt jede Woche. Vorlagen: Push, Pull, Legs, Oberkörper, Unterkörper, Ganzkörper u. a.
+  Pläne lassen sich auf andere Tage kopieren.
+- **Heutiges Training in der Mitte** – mit Übungsbildern und „Training starten“.
+- **Laufendes Training** – Stoppuhr, Fortschrittsbalken, pro Übung Sätze mit kg & Wdh.
+  - Spalte **„Vorher“** zeigt die Werte vom letzten Mal, sie werden als Vorschlag eingetragen
+  - **Alltime High** pro Übung, neuer Rekord wird live mit 🏆 markiert (+ Vibration)
+  - **Pausentimer** nach jedem Satz (±15 s, merkt sich deine Pausenlänge)
+  - Sätze/Übungen hinzufügen, entfernen, umsortieren · Bildschirm bleibt an
+- **Zusammenfassung** nach dem Training: Dauer, Volumen, Sätze, neue Rekorde.
+- **Übungsbibliothek** – 876 Übungen mit Fotos (Start-/Endposition animiert), Suche auf Deutsch
+  und Englisch, Filter nach Muskelgruppe, eigene Übungen anlegen.
+- **Übungsdetails** – Rekord, geschätztes 1RM, Fortschrittsdiagramm, Verlauf, Ausführung.
+- **Motivation** – Wochen-Serie 🔥, Wochenziel-Ring, Spruch des Tages.
+
+Alle Daten bleiben lokal auf dem Gerät (AsyncStorage). Die Übungsbilder werden aus dem Internet
+geladen und danach zwischengespeichert.
+
+Übungsdaten & Bilder: [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (Public Domain / Unlicense).
+
+## Projektstruktur
+
+```
+src/app/            Screens (Expo Router)
+  index.tsx         Startseite: Woche, heutiges Training, Statistik, Wochenplan
+  workout.tsx       Laufendes Training
+  day/[date].tsx    Rückblick auf einen Tag
+  plan/[day].tsx    Plan für einen Wochentag bearbeiten
+  exercises.tsx     Übungsbibliothek / Auswahl
+  exercise/[id].tsx Übungsdetails
+  log/[id].tsx      Trainingszusammenfassung
+src/components/     UI-Bausteine
+src/data/           Übungsdatenbank, deutsche Namen, Vorlagen
+src/lib/            Datums- und Statistikfunktionen
+src/store/          App-Zustand + Speicherung
+```
 
 ---
 
-## 1. Testen mit Snack + Expo Go (ohne Mac, ohne Account-Kosten)
+## 1. Testen mit Expo Go
 
 1. **Expo Go** aus dem App Store aufs iPhone laden.
-2. https://snack.expo.dev öffnen → links oben **„Import git repository“** →
-   `https://github.com/foberaig-sys/fittnestracker` eintragen
-   *(Alternative: Inhalt von `App.js` in einen neuen Snack kopieren.)*
-3. In Snack die SDK-Version auf **58** stellen (unten rechts). Falls Snack
-   `@react-native-async-storage/async-storage` und
-   `react-native-safe-area-context` nicht automatisch erkennt, auf
-   „Add dependency“ klicken.
-4. Rechts **„My Device“** wählen und den QR-Code mit der iPhone-Kamera scannen
-   → App öffnet sich in Expo Go.
+2. Am Computer (Node.js installiert):
+   ```bash
+   npm install
+   npx expo start
+   ```
+3. QR-Code mit der iPhone-Kamera scannen → App öffnet sich in Expo Go.
+   (iPhone und Computer müssen im selben WLAN sein, sonst `npx expo start --tunnel`.)
 
-> Expo Go im App Store unterstützt immer nur die aktuelle SDK-Version. Wenn
-> Expo Go eine neuere SDK verlangt, das Projekt mit `npx expo install expo@latest --fix`
-> aktualisieren.
+### Alternativ über Snack (ohne Computer-Setup)
 
-### Alternativ lokal (Computer + iPhone im selben WLAN)
+https://snack.expo.dev → **„Import git repository“** → URL dieses GitHub-Repos eintragen →
+SDK 58 wählen → rechts **„My Device“** → QR-Code mit dem iPhone scannen.
 
-```bash
-npm install
-npx expo start        # QR-Code mit der iPhone-Kamera scannen
-```
+> Expo Go im App Store unterstützt nur die aktuelle SDK-Version. Verlangt Expo Go eine neuere SDK:
+> `npx expo install expo@latest --fix`.
 
 ## 2. Auf das eigene iPhone installieren (Apple Developer Program)
 
-Voraussetzungen: kostenpflichtiger Apple-Developer-Account (99 €/Jahr) und ein
-kostenloser Expo-Account (https://expo.dev/signup). Ein Mac ist **nicht** nötig –
-EAS baut in der Cloud.
+Voraussetzungen: Apple-Developer-Account (99 €/Jahr) und ein kostenloser Expo-Account
+(https://expo.dev/signup). Ein Mac ist **nicht** nötig – EAS baut in der Cloud.
 
 ```bash
-npm install -g eas-cli
-eas login
-eas init                       # verknüpft das Projekt mit deinem Expo-Account
+npx eas-cli@latest login
+npx eas-cli@latest init          # verknüpft das Projekt mit deinem Expo-Account
 ```
 
-> Die Bundle-ID in `app.json` (`com.foberaig.fittnestracker`) muss weltweit
-> eindeutig sein – ggf. anpassen, bevor du das erste Mal baust.
+> Die Bundle-ID in `app.json` (`com.foberaig.fittnestracker`) muss weltweit eindeutig sein –
+> ggf. vor dem ersten Build anpassen.
 
-### Variante A: Direkt aufs Gerät (Ad-hoc / „internal distribution“)
+### Variante A: Direkt aufs Gerät (Ad-hoc)
 
 ```bash
-eas device:create              # Link auf dem iPhone öffnen, Profil installieren
-eas build --platform ios --profile preview
+npx eas-cli@latest device:create                         # Link auf dem iPhone öffnen, Profil installieren
+npx eas-cli@latest build --platform ios --profile preview
 ```
 
-EAS fragt nach deinem Apple-Login und erstellt Zertifikat + Provisioning
-Profile automatisch. Nach dem Build einen QR-Code/Link auf dem iPhone öffnen →
-App installieren. Ab iOS 16 einmalig **Einstellungen → Datenschutz & Sicherheit
-→ Entwicklermodus** aktivieren.
+EAS fragt nach deinem Apple-Login und erstellt Zertifikat und Provisioning Profile automatisch.
+Nach dem Build den Link/QR-Code auf dem iPhone öffnen → installieren. Einmalig
+**Einstellungen → Datenschutz & Sicherheit → Entwicklermodus** aktivieren.
 
-### Variante B: Über TestFlight
+### Variante B: TestFlight
 
 ```bash
-eas build --platform ios --profile production
-eas submit --platform ios      # lädt den Build zu App Store Connect hoch
+npx eas-cli@latest build --platform ios --profile production
+npx eas-cli@latest submit --platform ios
 ```
 
-Danach in App Store Connect unter **TestFlight** dich selbst als Tester
-hinzufügen und die App über die TestFlight-App installieren.
+In App Store Connect unter **TestFlight** dich selbst als Tester eintragen und die App über die
+TestFlight-App installieren.
 
-## Build-Profile (`eas.json`)
+## Entwicklung
 
-| Profil        | Zweck                                                        |
-|---------------|--------------------------------------------------------------|
-| `development` | Development Build (nötig, sobald native Module außerhalb von Expo Go verwendet werden) |
-| `preview`     | Ad-hoc-Build für registrierte Geräte                         |
-| `production`  | App-Store- / TestFlight-Build                                 |
+```bash
+npm run lint        # ESLint
+npm run typecheck   # TypeScript
+```
