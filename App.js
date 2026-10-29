@@ -13,6 +13,7 @@ import {
   BackHandler,
   FlatList,
   Image,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -28,24 +29,26 @@ import Svg, { Circle, Defs, LinearGradient as SvgGradient, Path, Stop } from 're
 // ============================================================================
 
 const C = {
-  bg: '#0A0A0E',
-  surface: '#14141B',
-  surface2: '#1C1C26',
-  border: '#272733',
-  text: '#F5F5F7',
-  muted: '#8E8EA0',
-  faint: '#5A5A6B',
-  accent: '#C8FF4D',
-  accent2: '#4DFFB0',
-  onAccent: '#0A0A0E',
-  gold: '#FFC94D',
-  danger: '#FF5C6C',
-  doneBg: 'rgba(200,255,77,0.10)',
+  bg: '#0C0A0A',
+  surface: '#151212',
+  surface2: '#1F1A1A',
+  border: 'rgba(255,255,255,0.08)',
+  text: '#F3EDE7',
+  muted: '#9B928B',
+  faint: '#5F5854',
+  accent: '#A8233A', // Bordeaux für Flächen
+  red: '#D04A5D', // gut lesbares Rot für Text & Icons
+  onAccent: '#F7F1EA',
+  ink: '#161011',
+  gold: '#C9A66B', // Champagner für Rekorde
+  danger: '#D04A5D',
+  doneBg: 'rgba(168,35,58,0.16)',
 };
-const GRADIENT = ['#C8FF4D', '#4DFFB0'];
-const GOLD = ['#FFE07A', '#FFB23F'];
-const HERO_SHADE = ['rgba(10,10,14,0.15)', 'rgba(10,10,14,0.75)', '#0A0A0E'];
-const R = { sm: 10, md: 16, lg: 24, pill: 999 };
+const GRADIENT = ['#B42B42', '#741322'];
+const GOLD = ['#DFC490', '#A6824C'];
+const HERO_SHADE = ['rgba(12,10,10,0.1)', 'rgba(12,10,10,0.72)', '#0C0A0A'];
+const SERIF = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia, serif' });
+const R = { sm: 8, md: 14, lg: 20, pill: 999 };
 
 // ============================================================================
 // Übungsdaten
@@ -863,9 +866,9 @@ function GradientButton({ label, icon, onPress, style, gold }) {
       }}
       style={({ pressed }) => [{ transform: [{ scale: pressed ? 0.97 : 1 }] }, style]}
     >
-      <LinearGradient colors={gold ? GOLD : GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.gradientButton}>
-        {icon && <Ionicons name={icon} size={20} color={C.onAccent} />}
-        <Text style={s.gradientButtonText}>{label}</Text>
+      <LinearGradient colors={gold ? GOLD : GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={s.gradientButton}>
+        {icon && <Ionicons name={icon} size={18} color={gold ? C.ink : C.onAccent} />}
+        <Text style={[s.gradientButtonText, gold && { color: C.ink }]}>{label}</Text>
       </LinearGradient>
     </Pressable>
   );
@@ -912,8 +915,8 @@ function Chip({ label, active, onPress, icon }) {
       }}
       style={[s.chip, active && s.chipActive]}
     >
-      {icon && <Ionicons name={icon} size={14} color={active ? C.onAccent : C.text} />}
-      <Text style={[s.chipText, active && { color: C.onAccent }]}>{label}</Text>
+      {icon && <Ionicons name={icon} size={14} color={active ? C.ink : C.muted} />}
+      <Text style={[s.chipText, active && { color: C.ink }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -944,14 +947,13 @@ function SectionTitle({ children, right }) {
   );
 }
 
-function StatTile({ label, value, icon }) {
+function StatTile({ label, value }) {
   return (
     <View style={s.statTile}>
-      <Ionicons name={icon} size={18} color={C.accent} />
+      <Text style={s.statLabel}>{label}</Text>
       <Text style={s.statValue} numberOfLines={1} adjustsFontSizeToFit>
         {value}
       </Text>
-      <Text style={s.statLabel}>{label}</Text>
     </View>
   );
 }
@@ -1008,7 +1010,7 @@ function ExerciseImage({ exercise, size, style, animate = false, rounded = R.sm 
   if (!uri) {
     return (
       <View style={[box, { backgroundColor: C.surface2, alignItems: 'center', justifyContent: 'center' }]}>
-        <MaterialCommunityIcons name={isCardio(exercise) ? 'run-fast' : 'dumbbell'} size={size ? size * 0.45 : 40} color={C.accent} />
+        <MaterialCommunityIcons name={isCardio(exercise) ? 'run-fast' : 'dumbbell'} size={size ? size * 0.45 : 40} color={C.red} />
       </View>
     );
   }
@@ -1019,7 +1021,7 @@ function ExerciseImage({ exercise, size, style, animate = false, rounded = R.sm 
   );
 }
 
-function ProgressRing({ progress, size = 78, stroke = 7, label, sublabel }) {
+function ProgressRing({ progress, size = 84, stroke = 3, label, sublabel }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const p = Math.max(0, Math.min(1, progress));
@@ -1028,8 +1030,8 @@ function ProgressRing({ progress, size = 78, stroke = 7, label, sublabel }) {
       <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
         <Defs>
           <SvgGradient id="ring" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor={C.accent} />
-            <Stop offset="1" stopColor={C.accent2} />
+            <Stop offset="0" stopColor={C.red} />
+            <Stop offset="1" stopColor={C.accent} />
           </SvgGradient>
         </Defs>
         <Circle cx={size / 2} cy={size / 2} r={r} stroke={C.surface2} strokeWidth={stroke} fill="none" />
@@ -1045,8 +1047,8 @@ function ProgressRing({ progress, size = 78, stroke = 7, label, sublabel }) {
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </Svg>
-      <Text style={{ color: C.text, fontSize: 16, fontWeight: '800' }}>{label}</Text>
-      {sublabel ? <Text style={{ color: C.muted, fontSize: 10, fontWeight: '600' }}>{sublabel}</Text> : null}
+      <Text style={{ color: C.text, fontSize: 22, fontWeight: '300', fontVariant: ['tabular-nums'] }}>{label}</Text>
+      {sublabel ? <Text style={{ color: C.muted, fontSize: 9, fontWeight: '600', letterSpacing: 1.5, textTransform: 'uppercase' }}>{sublabel}</Text> : null}
     </View>
   );
 }
@@ -1075,7 +1077,7 @@ function LineChart({ values, height = 140, unit = 'kg' }) {
         <Text style={s.chartLabel}>
           Start {formatKg(first)} {unit}
         </Text>
-        <Text style={[s.chartLabel, delta > 0 && { color: C.accent }]}>
+        <Text style={[s.chartLabel, delta > 0 && { color: C.red }]}>
           Jetzt {formatKg(last)} {unit}
           {delta !== 0 ? ` (${delta > 0 ? '+' : ''}${formatKg(delta)})` : ''}
         </Text>
@@ -1084,21 +1086,21 @@ function LineChart({ values, height = 140, unit = 'kg' }) {
         <Svg width={width} height={height}>
           <Defs>
             <SvgGradient id="area" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor={C.accent} stopOpacity={0.35} />
+              <Stop offset="0" stopColor={C.accent} stopOpacity={0.45} />
               <Stop offset="1" stopColor={C.accent} stopOpacity={0} />
             </SvgGradient>
           </Defs>
           <Path d={area} fill="url(#area)" />
-          <Path d={line} stroke={C.accent} strokeWidth={2.5} fill="none" strokeLinejoin="round" />
+          <Path d={line} stroke={C.red} strokeWidth={2} fill="none" strokeLinejoin="round" />
           {points.map((p, i) => (
             <Circle
               key={i}
               cx={p.x}
               cy={p.y}
               r={i === points.length - 1 ? 5 : 3}
-              fill={i === points.length - 1 ? C.accent : C.bg}
-              stroke={C.accent}
-              strokeWidth={2}
+              fill={i === points.length - 1 ? C.red : C.bg}
+              stroke={C.red}
+              strokeWidth={1.5}
             />
           ))}
         </Svg>
@@ -1117,16 +1119,18 @@ function WeekStrip({ offset, onChangeOffset, plans, byDate, onPressDay }) {
   };
 
   return (
-    <View style={{ gap: 10 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <IconButton icon="chevron-back" onPress={() => onChangeOffset(offset - 1)} color={C.muted} />
-        <Pressable onPress={() => offset !== 0 && onChangeOffset(0)} style={{ alignItems: 'center' }}>
-          <Text style={{ color: C.text, fontSize: 15, fontWeight: '700' }}>{label}</Text>
-          <Text style={{ color: C.muted, fontSize: 12, marginTop: 1 }}>{formatWeekRange(start)}</Text>
+    <View style={s.week}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <Pressable onPress={() => offset !== 0 && onChangeOffset(0)}>
+          <Text style={s.kickerMuted}>{label}</Text>
+          <Text style={{ color: C.text, fontSize: 15, fontWeight: '500', marginTop: 3 }}>{formatWeekRange(start)}</Text>
         </Pressable>
-        <IconButton icon="chevron-forward" onPress={() => onChangeOffset(offset + 1)} color={C.muted} />
+        <View style={{ flexDirection: 'row', gap: 4 }}>
+          <IconButton icon="chevron-back" size={18} onPress={() => onChangeOffset(offset - 1)} color={C.muted} label="Vorherige Woche" style={s.weekArrow} />
+          <IconButton icon="chevron-forward" size={18} onPress={() => onChangeOffset(offset + 1)} color={C.muted} label="Nächste Woche" style={s.weekArrow} />
+        </View>
       </View>
-      <View style={{ flexDirection: 'row', gap: 6 }}>
+      <View style={{ flexDirection: 'row' }}>
         {Array.from({ length: 7 }, (_, i) => {
           const d = addDays(start, i);
           const key = dateKey(d);
@@ -1134,8 +1138,6 @@ function WeekStrip({ offset, onChangeOffset, plans, byDate, onPressDay }) {
           const done = byDate.has(key);
           const isToday = key === today;
           const planned = plan.items.length > 0;
-          const missed = key < today && planned && !done;
-          const textColor = done ? C.onAccent : isToday ? C.accent : null;
           return (
             <Pressable
               key={key}
@@ -1143,22 +1145,15 @@ function WeekStrip({ offset, onChangeOffset, plans, byDate, onPressDay }) {
                 tap();
                 onPressDay(key);
               }}
-              style={({ pressed }) => [s.day, isToday && s.dayToday, done && s.dayDone, pressed && { opacity: 0.7 }]}
+              style={({ pressed }) => [{ flex: 1, alignItems: 'center', gap: 6 }, pressed && { opacity: 0.6 }]}
             >
-              <Text style={[s.dayName, textColor && { color: textColor }]}>{WEEKDAYS_SHORT[i]}</Text>
-              <Text style={[s.dayNum, textColor && { color: textColor }]}>{d.getDate()}</Text>
-              <Text numberOfLines={1} style={[s.dayPlan, done && { color: C.onAccent }, !planned && { color: C.faint }]}>
-                {planned ? shortTitle(plan.title) : 'Ruhe'}
-              </Text>
-              <View style={{ height: 14, justifyContent: 'center', marginTop: 2 }}>
-                {done ? (
-                  <Ionicons name="checkmark-circle" size={14} color={C.onAccent} />
-                ) : missed ? (
-                  <View style={[s.dot, { backgroundColor: C.faint }]} />
-                ) : planned ? (
-                  <View style={[s.dot, { backgroundColor: isToday ? C.accent : C.border }]} />
-                ) : null}
+              <Text style={[s.dayName, isToday && { color: C.text }]}>{WEEKDAYS_SHORT[i]}</Text>
+              <View style={[s.dayCircle, isToday && s.dayToday, done && s.dayDone]}>
+                <Text style={[s.dayNum, done && { color: C.onAccent }, !done && !isToday && key < today && { color: C.muted }]}>{d.getDate()}</Text>
               </View>
+              <Text numberOfLines={1} style={[s.dayPlan, done && { color: C.red }, !planned && { color: C.faint }]}>
+                {planned ? shortTitle(plan.title) : '—'}
+              </Text>
             </Pressable>
           );
         })}
@@ -1254,13 +1249,13 @@ function HomeScreen() {
     <ScrollView style={s.screen} contentContainerStyle={{ paddingHorizontal: 18, paddingTop: insets.top + 8, paddingBottom: insets.bottom + 32 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 18 }}>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: C.muted, fontSize: 15, fontWeight: '500' }}>{greeting()}</Text>
-          <Text style={s.h1}>Dein Training</Text>
+          <Text style={s.kickerMuted}>{greeting()}</Text>
+          <Text style={[s.h1, { marginTop: 4 }]}>Dein Training</Text>
         </View>
         {streak > 0 && (
           <View style={s.streak}>
-            <Ionicons name="flame" size={16} color={C.gold} />
-            <Text style={{ color: C.gold, fontWeight: '800', fontSize: 13 }}>{streak} Wo.</Text>
+            <Ionicons name="flame-outline" size={15} color={C.gold} />
+            <Text style={{ color: C.gold, fontWeight: '600', fontSize: 13 }}>{streak} {streak === 1 ? 'Woche' : 'Wochen'}</Text>
           </View>
         )}
         <IconButton icon="barbell-outline" size={22} onPress={() => nav.push('exercises')} style={s.roundIcon} />
@@ -1273,12 +1268,19 @@ function HomeScreen() {
       <Text style={s.quote}>„{quoteOfDay()}“</Text>
 
       <SectionTitle>Diese Woche</SectionTitle>
-      <View style={{ flexDirection: 'row', gap: 10 }}>
-        <View style={[s.card, { padding: 10, alignItems: 'center', justifyContent: 'center' }]}>
-          <ProgressRing progress={week.planned ? week.done / week.planned : 0} label={`${week.done}/${week.planned}`} sublabel="Trainings" />
+      <View style={[s.card, { flexDirection: 'row', alignItems: 'center', gap: 18, paddingVertical: 18 }]}>
+        <ProgressRing progress={week.planned ? week.done / week.planned : 0} label={`${week.done}/${week.planned}`} sublabel="Trainings" />
+        <View style={{ flex: 1, gap: 14 }}>
+          <View>
+            <Text style={s.statLabel}>Trainingszeit</Text>
+            <Text style={s.statValueSmall}>{formatMinutes(week.time)}</Text>
+          </View>
+          <View style={s.hairline} />
+          <View>
+            <Text style={s.statLabel}>Bewegtes Gewicht</Text>
+            <Text style={s.statValueSmall}>{formatVolume(week.volume)}</Text>
+          </View>
         </View>
-        <StatTile icon="time-outline" label="Trainingszeit" value={formatMinutes(week.time)} />
-        <StatTile icon="barbell-outline" label="Volumen" value={formatVolume(week.volume)} />
       </View>
 
       <SectionTitle>Wochenplan</SectionTitle>
@@ -1294,7 +1296,7 @@ function HomeScreen() {
               }}
               style={({ pressed }) => [s.planRow, i < 6 && s.rowBorder, pressed && { opacity: 0.6 }]}
             >
-              <Text style={{ color: i === todayIndex ? C.accent : C.muted, fontWeight: '800', width: 24 }}>{name.slice(0, 2)}</Text>
+              <Text style={{ color: i === todayIndex ? C.red : C.muted, fontWeight: '600', width: 24, letterSpacing: 1, fontSize: 12, textTransform: 'uppercase' }}>{name.slice(0, 2)}</Text>
               <View style={{ flex: 1 }}>
                 <Text style={[s.rowTitle, !plan.items.length && { color: C.faint }]}>
                   {plan.items.length ? plan.title || 'Training' : 'Ruhetag'}
@@ -1314,7 +1316,7 @@ function HomeScreen() {
             {recent.map((w) => (
               <Pressable key={w.id} onPress={() => nav.push('log', { id: w.id })} style={({ pressed }) => [s.listCard, pressed && { opacity: 0.7 }]}>
                 <View style={s.doneIcon}>
-                  <Ionicons name="checkmark-done" size={18} color={C.accent} />
+                  <Ionicons name="checkmark" size={18} color={C.red} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={s.rowTitle}>{w.title}</Text>
@@ -1356,7 +1358,7 @@ function TodayHero() {
   if (active) {
     body = (
       <>
-        <Text style={s.kicker}>TRAINING LÄUFT</Text>
+        <Text style={s.heroKicker}>TRAINING LÄUFT</Text>
         <Text style={s.heroTitle}>{active.title}</Text>
         <Text style={s.heroTimer}>{formatDuration(now - active.startedAt)}</Text>
         <GradientButton label="Fortsetzen" icon="play" onPress={() => nav.push('workout')} />
@@ -1366,7 +1368,7 @@ function TodayHero() {
     const last = doneToday[doneToday.length - 1];
     body = (
       <>
-        <Text style={s.kicker}>HEUTE ERLEDIGT 💪</Text>
+        <Text style={s.heroKicker}>HEUTE ERLEDIGT</Text>
         <Text style={s.heroTitle}>{last.title}</Text>
         <Text style={s.heroMeta}>
           {formatMinutes(last.endedAt - last.startedAt)} · {formatVolume(workoutVolume(last))} bewegt
@@ -1380,16 +1382,12 @@ function TodayHero() {
   } else if (plan.items.length > 0) {
     body = (
       <>
-        <Text style={s.kicker}>HEUTE · {WEEKDAYS[todayIndex].toUpperCase()}</Text>
+        <Text style={s.heroKicker}>HEUTE · {WEEKDAYS[todayIndex].toUpperCase()}</Text>
         <Text style={s.heroTitle}>{plan.title || 'Training'}</Text>
         <Text style={s.heroMeta}>
-          {plan.items.length} Übungen · {totalSets} Sätze · ca. {Math.round((totalSets * 2.5) / 5) * 5} min
+          {plan.items.length} Übungen  ·  {totalSets} Sätze  ·  ca. {Math.round((totalSets * 2.5) / 5) * 5} Min
         </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-          {muscles.map((m) => (
-            <Tag key={m} label={MUSCLE_LABELS[m] || m} color={C.accent} />
-          ))}
-        </View>
+        {muscles.length > 0 && <Text style={s.heroMuscles}>{muscles.map((m) => MUSCLE_LABELS[m] || m).join('  ·  ')}</Text>}
         <View style={{ flexDirection: 'row', marginVertical: 6 }}>
           {exercises.slice(0, 5).map((e) => (
             <ExerciseImage key={e.id} exercise={e} size={44} rounded={12} style={s.thumb} />
@@ -1406,8 +1404,8 @@ function TodayHero() {
   } else {
     body = (
       <>
-        <Text style={s.kicker}>HEUTE · RUHETAG</Text>
-        <Text style={s.heroTitle}>Regeneration 😴</Text>
+        <Text style={s.heroKicker}>HEUTE · RUHETAG</Text>
+        <Text style={s.heroTitle}>Regeneration</Text>
         <Text style={s.heroMeta}>Muskeln wachsen in der Pause. Lust auf eine Extra-Session?</Text>
         <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
           <GhostButton label="Freies Training" icon="flash-outline" onPress={start} style={{ flex: 1 }} />
@@ -1509,12 +1507,7 @@ function WorkoutScreen() {
         </View>
         <Text style={s.timer}>{formatDuration(now - active.startedAt)}</Text>
         <View style={s.progressTrack}>
-          <LinearGradient
-            colors={GRADIENT}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ height: 6, borderRadius: 3, width: `${totalSets ? (doneSets / totalSets) * 100 : 0}%` }}
-          />
+          <View style={{ height: 3, borderRadius: 2, backgroundColor: C.red, width: `${totalSets ? (doneSets / totalSets) * 100 : 0}%` }} />
         </View>
         <Text style={s.progressText}>
           {doneSets}/{totalSets} Sätze
@@ -1538,7 +1531,7 @@ function WorkoutScreen() {
             prev={reference.get(ae.exerciseId)?.prev || null}
           />
         ))}
-        <GhostButton label="Übung hinzufügen" icon="add-circle-outline" color={C.accent} onPress={() => nav.push('exercises', { mode: 'workout' })} />
+        <GhostButton label="Übung hinzufügen" icon="add-circle-outline" color={C.red} onPress={() => nav.push('exercises', { mode: 'workout' })} />
         <GhostButton label="Training verwerfen" icon="trash-outline" color={C.danger} onPress={discard} />
       </ScrollView>
 
@@ -1639,7 +1632,7 @@ const ExerciseCard = memo(function ExerciseCard({ index, count, data, exercise, 
               {isPR ? (
                 <Ionicons name="trophy" size={16} color={C.gold} />
               ) : (
-                <Text style={{ color: set.done ? C.accent : C.text, fontWeight: '800', fontSize: 15 }}>{j + 1}</Text>
+                <Text style={{ color: set.done ? C.red : C.text, fontWeight: '800', fontSize: 15 }}>{j + 1}</Text>
               )}
             </Pressable>
             <Text style={{ flex: 1, color: C.muted, fontSize: 13 }} numberOfLines={1}>
@@ -1684,8 +1677,8 @@ const ExerciseCard = memo(function ExerciseCard({ index, count, data, exercise, 
         }}
         style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 12 }, pressed && { opacity: 0.6 }]}
       >
-        <Ionicons name="add" size={16} color={C.accent} />
-        <Text style={{ color: C.accent, fontWeight: '700' }}>Satz hinzufügen</Text>
+        <Ionicons name="add" size={16} color={C.red} />
+        <Text style={{ color: C.red, fontWeight: '700' }}>Satz hinzufügen</Text>
       </Pressable>
     </View>
   );
@@ -1772,7 +1765,7 @@ function LogScreen({ id, fresh }) {
       <ScrollView contentContainerStyle={{ padding: 18, gap: 10, paddingBottom: insets.bottom + 32 }}>
         {fresh ? (
           <LinearGradient colors={GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.celebrate}>
-            <Ionicons name={records.size ? 'trophy' : 'flash'} size={44} color={C.onAccent} />
+            <Ionicons name={records.size ? 'trophy-outline' : 'checkmark-circle-outline'} size={40} color={C.onAccent} />
             <Text style={s.celebrateTitle}>
               {records.size === 1 ? 'Neuer Rekord!' : records.size > 1 ? `${records.size} neue Rekorde!` : 'Training geschafft!'}
             </Text>
@@ -1832,11 +1825,11 @@ function DayScreen({ date }) {
         {workouts.map((w) => (
           <View key={w.id} style={{ gap: 12, marginTop: 18 }}>
             <Pressable onPress={() => nav.push('log', { id: w.id })} style={[s.listCard, { backgroundColor: C.surface2, borderWidth: 0 }]}>
-              <View style={[s.doneIcon, { backgroundColor: C.accent }]}>
-                <Ionicons name="checkmark-done" size={20} color={C.onAccent} />
+              <View style={s.doneIcon}>
+                <Ionicons name="checkmark" size={18} color={C.red} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={[s.rowTitle, { fontSize: 18, fontWeight: '800' }]}>{w.title}</Text>
+                <Text style={[s.rowTitle, { fontSize: 18, fontWeight: '600' }]}>{w.title}</Text>
                 <Text style={s.rowSub}>
                   {formatMinutes(w.endedAt - w.startedAt)} · {formatVolume(workoutVolume(w))} ·{' '}
                   {new Date(w.startedAt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr
@@ -2084,7 +2077,7 @@ function ExercisesScreen({ mode, day }) {
     <View style={s.screen}>
       <Header
         title={picking ? 'Übungen wählen' : 'Übungen'}
-        right={<IconButton icon="add" size={26} color={C.accent} onPress={() => nav.push('newExercise')} />}
+        right={<IconButton icon="add" size={26} color={C.red} onPress={() => nav.push('newExercise')} />}
       />
       <View style={s.searchWrap}>
         <Ionicons name="search" size={18} color={C.muted} />
@@ -2115,7 +2108,7 @@ function ExercisesScreen({ mode, day }) {
           <GhostButton label="Erneut versuchen" icon="refresh" onPress={reload} />
         </View>
       ) : loading ? (
-        <ActivityIndicator color={C.accent} style={{ marginTop: 40 }} />
+        <ActivityIndicator color={C.red} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={list}
@@ -2169,9 +2162,12 @@ const ExerciseRow = memo(function ExerciseRow({ exercise, pr, picking, selected,
           {muscleSummary(exercise)} · {EQUIPMENT_LABELS[exercise.eq] || exercise.eq}
         </Text>
         {pr && (
-          <Text style={{ color: C.gold, fontSize: 12, marginTop: 2, fontWeight: '700' }} numberOfLines={1}>
-            🏆 {formatKg(pr.weight)} kg × {pr.reps}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 3 }}>
+            <Ionicons name="trophy-outline" size={11} color={C.gold} />
+            <Text style={{ color: C.gold, fontSize: 12, fontWeight: '600' }} numberOfLines={1}>
+              {formatKg(pr.weight)} kg × {pr.reps}
+            </Text>
+          </View>
         )}
       </View>
       {picking ? (
@@ -2237,7 +2233,7 @@ function ExerciseScreen({ id }) {
 
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
             {ex.pm.map((m) => (
-              <Tag key={m} label={MUSCLE_LABELS[m] || m} color={C.accent} />
+              <Tag key={m} label={MUSCLE_LABELS[m] || m} color={C.red} />
             ))}
             {ex.sm.slice(0, 3).map((m) => (
               <Tag key={m} label={MUSCLE_LABELS[m] || m} />
@@ -2248,13 +2244,13 @@ function ExerciseScreen({ id }) {
 
           {pr ? (
             <LinearGradient colors={GOLD} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.prCard}>
-              <Ionicons name="trophy" size={30} color={C.onAccent} />
+              <Ionicons name="trophy-outline" size={28} color={C.ink} />
               <View style={{ flex: 1 }}>
-                <Text style={[s.kicker, { color: C.onAccent, opacity: 0.7 }]}>ALLTIME HIGH</Text>
-                <Text style={{ color: C.onAccent, fontSize: 26, fontWeight: '900' }}>
+                <Text style={[s.kicker, { color: C.ink, opacity: 0.6 }]}>ALLTIME HIGH</Text>
+                <Text style={{ color: C.ink, fontSize: 30, fontWeight: '300', fontVariant: ['tabular-nums'] }}>
                   {formatKg(pr.weight)} {labels.weight} × {pr.reps}
                 </Text>
-                <Text style={{ color: C.onAccent, opacity: 0.7, fontSize: 13, fontWeight: '600' }}>
+                <Text style={{ color: C.ink, opacity: 0.65, fontSize: 13, fontWeight: '500' }}>
                   am {formatShort(pr.date)}
                   {pr.e1rm > 0 && labels.weight === 'kg' ? ` · geschätztes 1RM ${formatKg(Math.round(pr.e1rm * 2) / 2)} kg` : ''}
                 </Text>
@@ -2296,7 +2292,7 @@ function ExerciseScreen({ id }) {
               <SectionTitle
                 right={
                   <Pressable onPress={() => setShowSteps((v) => !v)}>
-                    <Text style={{ color: C.accent, fontWeight: '700' }}>{showSteps ? 'Weniger' : 'Anzeigen'}</Text>
+                    <Text style={{ color: C.red, fontWeight: '700' }}>{showSteps ? 'Weniger' : 'Anzeigen'}</Text>
                   </Pressable>
                 }
               >
@@ -2304,7 +2300,7 @@ function ExerciseScreen({ id }) {
               </SectionTitle>
               {(showSteps ? ex.ins : ex.ins.slice(0, 1)).map((step, i) => (
                 <View key={i} style={{ flexDirection: 'row', gap: 12, marginBottom: 10 }}>
-                  <Text style={{ color: C.accent, fontWeight: '900', width: 18 }}>{i + 1}</Text>
+                  <Text style={{ color: C.red, fontWeight: '900', width: 18 }}>{i + 1}</Text>
                   <Text style={{ color: C.text, flex: 1, lineHeight: 21 }}>{step}</Text>
                 </View>
               ))}
@@ -2402,7 +2398,7 @@ function Root() {
             <Screen key={stack.length + top.name} {...top.params} />
           ) : (
             <View style={[s.screen, { alignItems: 'center', justifyContent: 'center' }]}>
-              <ActivityIndicator color={C.accent} />
+              <ActivityIndicator color={C.red} />
             </View>
           )}
         </NavContext.Provider>
@@ -2425,45 +2421,46 @@ export default function App() {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: C.bg },
-  h1: { color: C.text, fontSize: 32, fontWeight: '800', letterSpacing: -0.5 },
-  h2: { color: C.text, fontSize: 22, fontWeight: '800', letterSpacing: -0.3 },
-  kicker: { color: C.accent, fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
-  label: { color: C.muted, fontSize: 13, fontWeight: '500', marginTop: 20, marginBottom: 8 },
-  hint: { color: C.faint, fontSize: 12, marginTop: 8 },
+  h1: { color: C.text, fontFamily: SERIF, fontSize: 34, fontWeight: '400', letterSpacing: -0.5 },
+  h2: { color: C.text, fontFamily: SERIF, fontSize: 26, fontWeight: '400', letterSpacing: -0.3 },
+  kicker: { color: C.red, fontSize: 11, fontWeight: '600', letterSpacing: 2, textTransform: 'uppercase' },
+  kickerMuted: { color: C.muted, fontSize: 11, fontWeight: '600', letterSpacing: 2, textTransform: 'uppercase' },
+  label: { color: C.muted, fontSize: 11, fontWeight: '600', letterSpacing: 1.6, textTransform: 'uppercase', marginTop: 24, marginBottom: 10 },
+  hint: { color: C.faint, fontSize: 12, marginTop: 10 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  hairline: { height: StyleSheet.hairlineWidth, backgroundColor: C.border },
   input: {
     backgroundColor: C.surface,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: C.border,
     borderRadius: R.md,
     color: C.text,
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '500',
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
 
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingBottom: 8, gap: 6, backgroundColor: C.bg },
-  headerTitle: { flex: 1, color: C.text, fontSize: 17, fontWeight: '700', textAlign: 'center' },
-  floatingBack: { position: 'absolute', left: 12, backgroundColor: 'rgba(10,10,14,0.6)', borderRadius: R.pill, padding: 8 },
+  headerTitle: { flex: 1, color: C.text, fontSize: 16, fontWeight: '600', textAlign: 'center', letterSpacing: 0.2 },
+  floatingBack: { position: 'absolute', left: 14, backgroundColor: 'rgba(12,10,10,0.55)', borderRadius: R.pill, padding: 8 },
 
-  gradientButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, paddingHorizontal: 22, borderRadius: R.pill },
-  gradientButtonText: { color: C.onAccent, fontSize: 17, fontWeight: '800', letterSpacing: 0.2 },
+  gradientButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingVertical: 17, paddingHorizontal: 22, borderRadius: R.md },
+  gradientButtonText: { color: C.onAccent, fontSize: 14, fontWeight: '700', letterSpacing: 1.6, textTransform: 'uppercase' },
   ghostButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 12,
+    gap: 8,
+    paddingVertical: 14,
     paddingHorizontal: 16,
-    borderRadius: R.pill,
-    borderWidth: 1,
-    borderColor: C.border,
-    backgroundColor: C.surface,
+    borderRadius: R.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.18)',
   },
-  ghostButtonText: { fontSize: 15, fontWeight: '700' },
+  ghostButtonText: { fontSize: 13, fontWeight: '600', letterSpacing: 1.2, textTransform: 'uppercase' },
   iconButton: { padding: 6, alignItems: 'center', justifyContent: 'center' },
-  roundIcon: { backgroundColor: C.surface, borderRadius: R.pill, padding: 10, borderWidth: 1, borderColor: C.border },
+  roundIcon: { borderRadius: R.pill, padding: 10, borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.18)' },
 
   chip: {
     flexDirection: 'row',
@@ -2472,115 +2469,118 @@ const s = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: R.pill,
-    backgroundColor: C.surface,
-    borderWidth: 1,
-    borderColor: C.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.18)',
   },
-  chipActive: { backgroundColor: C.accent, borderColor: C.accent },
-  chipText: { color: C.text, fontSize: 14, fontWeight: '600' },
-  tag: { borderWidth: 1, borderRadius: R.pill, paddingHorizontal: 10, paddingVertical: 4 },
-  tagText: { fontSize: 12, fontWeight: '700' },
-  prBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,201,77,0.12)',
-    borderRadius: R.pill,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  prBadgeText: { color: C.gold, fontSize: 12, fontWeight: '700' },
+  chipActive: { backgroundColor: C.text, borderColor: C.text },
+  chipText: { color: C.text, fontSize: 13, fontWeight: '500', letterSpacing: 0.2 },
+  tag: { borderWidth: StyleSheet.hairlineWidth, borderRadius: R.pill, paddingHorizontal: 10, paddingVertical: 4 },
+  tagText: { fontSize: 11, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase' },
+  prBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start' },
+  prBadgeText: { color: C.gold, fontSize: 12, fontWeight: '600', letterSpacing: 0.3 },
 
-  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 28, marginBottom: 12 },
-  sectionTitle: { color: C.text, fontSize: 19, fontWeight: '700' },
-  card: { backgroundColor: C.surface, borderRadius: R.md, borderWidth: 1, borderColor: C.border, padding: 16 },
-  cardTitle: { color: C.text, fontSize: 16, fontWeight: '800' },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 36, marginBottom: 14 },
+  sectionTitle: { color: C.muted, fontSize: 11, fontWeight: '600', letterSpacing: 2, textTransform: 'uppercase' },
+  card: { backgroundColor: C.surface, borderRadius: R.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: C.border, padding: 16 },
+  cardTitle: { color: C.text, fontSize: 16, fontWeight: '600' },
   listCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 14,
     backgroundColor: C.surface,
     borderRadius: R.md,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: C.border,
     padding: 14,
   },
-  rowTitle: { color: C.text, fontSize: 16, fontWeight: '700' },
-  rowSub: { color: C.muted, fontSize: 12, marginTop: 2 },
+  rowTitle: { color: C.text, fontSize: 16, fontWeight: '500' },
+  rowSub: { color: C.muted, fontSize: 12, marginTop: 3 },
   rowBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.border },
-  planRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 13, paddingHorizontal: 16, gap: 14 },
-  doneIcon: { width: 38, height: 38, borderRadius: 19, backgroundColor: C.doneBg, alignItems: 'center', justifyContent: 'center' },
+  planRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 18, gap: 16 },
+  doneIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(208,74,93,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
-  statTile: { flex: 1, backgroundColor: C.surface, borderRadius: R.md, borderWidth: 1, borderColor: C.border, padding: 14, gap: 4 },
-  statValue: { color: C.text, fontSize: 20, fontWeight: '800', marginTop: 4 },
-  statLabel: { color: C.muted, fontSize: 13, fontWeight: '500' },
-  stepper: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.surface2, borderRadius: R.pill, paddingHorizontal: 4 },
-  stepperValue: { color: C.text, fontSize: 16, fontWeight: '800', minWidth: 22, textAlign: 'center' },
+  statTile: { flex: 1, backgroundColor: C.surface, borderRadius: R.lg, borderWidth: StyleSheet.hairlineWidth, borderColor: C.border, padding: 16, gap: 6 },
+  statValue: { color: C.text, fontSize: 30, fontWeight: '200', fontVariant: ['tabular-nums'], letterSpacing: -0.5 },
+  statValueSmall: { color: C.text, fontSize: 24, fontWeight: '300', fontVariant: ['tabular-nums'], marginTop: 2 },
+  statLabel: { color: C.muted, fontSize: 10, fontWeight: '600', letterSpacing: 1.6, textTransform: 'uppercase' },
+  stepper: { flexDirection: 'row', alignItems: 'center', borderRadius: R.pill, borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.18)', paddingHorizontal: 2 },
+  stepperValue: { color: C.text, fontSize: 16, fontWeight: '500', minWidth: 22, textAlign: 'center', fontVariant: ['tabular-nums'] },
   empty: { alignItems: 'center', paddingVertical: 32, gap: 8 },
-  emptyTitle: { color: C.text, fontSize: 17, fontWeight: '700', textAlign: 'center' },
-  emptyText: { color: C.muted, fontSize: 15, textAlign: 'center' },
-  chartLabel: { color: C.muted, fontSize: 12, fontWeight: '600' },
+  emptyTitle: { color: C.text, fontFamily: SERIF, fontSize: 20, textAlign: 'center' },
+  emptyText: { color: C.muted, fontSize: 14, textAlign: 'center', lineHeight: 20 },
+  chartLabel: { color: C.muted, fontSize: 12, fontWeight: '500' },
 
   streak: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255,201,77,0.12)',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: R.pill,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(201,166,107,0.45)',
   },
-  day: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: R.md, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, gap: 2 },
-  dayToday: { borderColor: C.accent, borderWidth: 1.5 },
-  dayDone: { backgroundColor: C.accent, borderColor: C.accent },
-  dayName: { color: C.muted, fontSize: 11, fontWeight: '700' },
-  dayNum: { color: C.text, fontSize: 18, fontWeight: '800' },
-  dayPlan: { color: C.muted, fontSize: 9.5, fontWeight: '700', maxWidth: '92%' },
-  dot: { width: 6, height: 6, borderRadius: 3 },
+  week: { paddingVertical: 4 },
+  weekArrow: { borderRadius: R.pill, borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.14)', padding: 7 },
+  dayName: { color: C.muted, fontSize: 10, fontWeight: '600', letterSpacing: 1.2, textTransform: 'uppercase' },
+  dayCircle: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
+  dayToday: { borderWidth: 1, borderColor: C.red },
+  dayDone: { backgroundColor: C.accent, borderWidth: 0 },
+  dayNum: { color: C.text, fontSize: 16, fontWeight: '500', fontVariant: ['tabular-nums'] },
+  dayPlan: { color: C.muted, fontSize: 9, fontWeight: '600', letterSpacing: 0.6, textTransform: 'uppercase', maxWidth: '94%' },
 
-  hero: { marginTop: 22, borderRadius: R.lg, overflow: 'hidden', minHeight: 330, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border },
-  heroTitle: { color: C.text, fontSize: 34, fontWeight: '900', letterSpacing: -0.8 },
-  heroMeta: { color: '#C9C9D6', fontSize: 15, fontWeight: '500' },
-  heroTimer: { color: C.text, fontSize: 46, fontWeight: '900', fontVariant: ['tabular-nums'], marginBottom: 6 },
-  thumb: { marginRight: -8, borderWidth: 2, borderColor: C.bg },
+  hero: { marginTop: 26, borderRadius: R.lg, overflow: 'hidden', minHeight: 360, backgroundColor: C.surface },
+  heroTitle: { color: C.text, fontSize: 36, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
+  heroMeta: { color: '#D3CBC4', fontSize: 13, fontWeight: '500', letterSpacing: 0.4 },
+  heroKicker: { color: 'rgba(243,237,231,0.8)', fontSize: 11, fontWeight: '600', letterSpacing: 2, textTransform: 'uppercase' },
+  heroMuscles: { color: C.gold, fontSize: 11, fontWeight: '600', letterSpacing: 1.6, textTransform: 'uppercase' },
+  heroTimer: { color: C.text, fontSize: 56, fontWeight: '200', fontVariant: ['tabular-nums'], marginBottom: 6, letterSpacing: -1 },
+  thumb: { marginRight: -6, borderWidth: 2, borderColor: C.bg },
   more: { width: 44, height: 44, borderRadius: 12, backgroundColor: C.surface2, alignItems: 'center', justifyContent: 'center' },
-  quote: { color: C.muted, fontStyle: 'italic', textAlign: 'center', marginTop: 16, fontSize: 14 },
+  quote: { color: C.muted, fontFamily: SERIF, fontStyle: 'italic', textAlign: 'center', marginTop: 22, fontSize: 16, lineHeight: 22, paddingHorizontal: 12 },
 
-  workoutTop: { paddingHorizontal: 16, paddingBottom: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.border },
-  finishBtn: { backgroundColor: C.accent, paddingHorizontal: 16, paddingVertical: 8, borderRadius: R.pill },
-  timer: { color: C.text, fontSize: 52, fontWeight: '900', textAlign: 'center', fontVariant: ['tabular-nums'], letterSpacing: -1, marginTop: 4 },
-  progressTrack: { height: 6, borderRadius: 3, backgroundColor: C.surface2, overflow: 'hidden', marginTop: 6 },
-  progressText: { color: C.muted, fontSize: 12, textAlign: 'center', marginTop: 6, fontWeight: '600' },
-  setHead: { color: C.faint, fontSize: 10, fontWeight: '700', letterSpacing: 0.8 },
-  setRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 5, paddingHorizontal: 4, borderRadius: 12 },
+  workoutTop: { paddingHorizontal: 16, paddingBottom: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.border },
+  finishBtn: { backgroundColor: C.accent, paddingHorizontal: 16, paddingVertical: 9, borderRadius: R.pill },
+  timer: { color: C.text, fontSize: 68, fontWeight: '200', textAlign: 'center', fontVariant: ['tabular-nums'], letterSpacing: -2, marginTop: 6 },
+  progressTrack: { height: 3, borderRadius: 2, backgroundColor: C.surface2, overflow: 'hidden', marginTop: 8 },
+  progressText: { color: C.muted, fontSize: 10, textAlign: 'center', marginTop: 8, fontWeight: '600', letterSpacing: 1.6, textTransform: 'uppercase' },
+  setHead: { color: C.faint, fontSize: 9, fontWeight: '600', letterSpacing: 1.4 },
+  setRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 5, paddingHorizontal: 4, borderRadius: 10 },
   inputCol: { width: 64, textAlign: 'center' },
-  setInput: { backgroundColor: C.surface2, color: C.text, borderRadius: 10, paddingVertical: 9, fontSize: 16, fontWeight: '700' },
-  check: { width: 44, height: 38, borderRadius: 10, backgroundColor: C.surface2, alignItems: 'center', justifyContent: 'center' },
+  setInput: { backgroundColor: C.surface2, color: C.text, borderRadius: 8, paddingVertical: 9, fontSize: 16, fontWeight: '500', fontVariant: ['tabular-nums'] },
+  check: { width: 44, height: 38, borderRadius: 8, borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
 
   rest: {
     position: 'absolute',
     left: 14,
     right: 14,
-    backgroundColor: C.surface2,
+    backgroundColor: '#1A1515',
     borderRadius: R.lg,
-    borderWidth: 1,
-    borderColor: C.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.12)',
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.6,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
   },
-  restFill: { position: 'absolute', top: 0, bottom: 0, left: 0, backgroundColor: 'rgba(200,255,77,0.10)' },
-  restTime: { color: C.text, fontSize: 28, fontWeight: '900', fontVariant: ['tabular-nums'] },
-  restBtn: { backgroundColor: C.surface, borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 9 },
-  restBtnText: { color: C.text, fontWeight: '800' },
+  restFill: { position: 'absolute', top: 0, bottom: 0, left: 0, backgroundColor: 'rgba(168,35,58,0.22)' },
+  restTime: { color: C.text, fontSize: 32, fontWeight: '200', fontVariant: ['tabular-nums'] },
+  restBtn: { borderRadius: R.pill, borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 13, paddingVertical: 9 },
+  restBtnText: { color: C.text, fontWeight: '600', fontSize: 13 },
 
-  celebrate: { borderRadius: R.lg, padding: 24, alignItems: 'center', gap: 8, marginBottom: 6 },
-  celebrateTitle: { color: C.onAccent, fontSize: 26, fontWeight: '900', textAlign: 'center' },
-  logSetRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 7, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.border },
-  logSetVal: { color: C.text, fontWeight: '700', fontSize: 15, flex: 1 },
+  celebrate: { borderRadius: R.lg, paddingVertical: 32, paddingHorizontal: 24, alignItems: 'center', gap: 10, marginBottom: 6 },
+  celebrateTitle: { color: C.onAccent, fontFamily: SERIF, fontSize: 30, textAlign: 'center' },
+  logSetRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 9, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.border },
+  logSetVal: { color: C.text, fontWeight: '500', fontSize: 15, flex: 1, fontVariant: ['tabular-nums'] },
 
   searchWrap: {
     flexDirection: 'row',
@@ -2590,11 +2590,11 @@ const s = StyleSheet.create({
     paddingHorizontal: 14,
     backgroundColor: C.surface,
     borderRadius: R.md,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: C.border,
   },
-  exRow: { height: ROW_HEIGHT, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16 },
-  pickCircle: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  exRow: { height: ROW_HEIGHT, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16 },
+  pickCircle: { width: 26, height: 26, borderRadius: 13, borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center' },
   footer: {
     position: 'absolute',
     left: 0,
@@ -2606,6 +2606,6 @@ const s = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: C.border,
   },
-  prCard: { flexDirection: 'row', alignItems: 'center', gap: 14, borderRadius: R.lg, padding: 18, marginTop: 20 },
-  histRow: { flexDirection: 'row', gap: 12, backgroundColor: C.surface, borderRadius: R.sm, padding: 12 },
+  prCard: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: R.lg, padding: 20, marginTop: 22 },
+  histRow: { flexDirection: 'row', gap: 12, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.border },
 });
