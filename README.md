@@ -1,6 +1,6 @@
 # GymTracker
 
-Ein bewusst simpler Gym-Tracker (Expo / React Native, SDK 58, Expo Router).
+Ein bewusst simpler Gym-Tracker (Expo / React Native, SDK 55, Expo Router).
 
 ## Funktionen
 
@@ -59,8 +59,13 @@ src/store/          App-Zustand + Speicherung
 
 ### Alternativ über Snack (ohne Computer-Setup)
 
-https://snack.expo.dev → **„Import git repository“** → URL dieses GitHub-Repos eintragen →
-SDK 58 wählen → rechts **„My Device“** → QR-Code mit dem iPhone scannen.
+https://snack.expo.dev → links bei „Project“ auf **⋮** → **„Import git repository“** →
+`https://github.com/foberaig-sys/FittnesTracker` eintragen → **„Show advanced options“** →
+Branch **`snack`** eintragen → importieren → unten SDK **55** wählen → rechts **„My Device“** →
+QR-Code mit dem iPhone scannen.
+
+Der Branch `snack` ist eine abgespeckte Kopie von `main` (ohne Bilder, Lockfile und Tooling),
+damit der Snack-Import funktioniert. Er wird mit `scripts/make-snack-branch.sh` aus `main` erzeugt.
 
 > Expo Go im App Store unterstützt nur die aktuelle SDK-Version. Verlangt Expo Go eine neuere SDK:
 > `npx expo install expo@latest --fix`.
