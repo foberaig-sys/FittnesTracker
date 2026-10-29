@@ -1,14 +1,20 @@
 import type { Exercise } from '../lib/types';
+import { RAW_EXERCISES } from './exerciseData';
 import { GERMAN_NAMES } from './germanNames';
-import raw from './exercises.json';
 
 // Bilder & Daten: free-exercise-db (Public Domain / Unlicense) – https://github.com/yuhonas/free-exercise-db
-const IMAGE_BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises';
+const DB_BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises';
 
-export const BUILTIN_EXERCISES: Exercise[] = (raw as Exercise[]).map((e) => ({
-  ...e,
-  name: GERMAN_NAMES[e.id] ?? e.name,
-  en: e.name,
+export const BUILTIN_EXERCISES: Exercise[] = RAW_EXERCISES.map(([id, name, pm, sm, eq, cat, lvl, img]) => ({
+  id,
+  name: GERMAN_NAMES[id] ?? name,
+  en: name,
+  pm,
+  sm,
+  eq,
+  cat,
+  lvl,
+  img,
 }));
 
 const builtinById = new Map(BUILTIN_EXERCISES.map((e) => [e.id, e]));
@@ -18,7 +24,16 @@ export const POPULAR_IDS = new Set(Object.keys(GERMAN_NAMES));
 
 export function exerciseImage(ex: Exercise | undefined, frame = 0): string | null {
   if (!ex || ex.img === 0) return null;
-  return `${IMAGE_BASE}/${ex.id}/${Math.min(frame, ex.img - 1)}.jpg`;
+  return `${DB_BASE}/${ex.id}/${Math.min(frame, ex.img - 1)}.jpg`;
+}
+
+/** Anleitung wird erst bei Bedarf geladen, um die App klein zu halten. */
+export async function fetchInstructions(ex: Exercise): Promise<string[]> {
+  if (ex.custom) return [];
+  const res = await fetch(`${DB_BASE}/${ex.id}.json`);
+  if (!res.ok) return [];
+  const data: { instructions?: string[] } = await res.json();
+  return data.instructions ?? [];
 }
 
 export function findExercise(id: string, custom: Exercise[] = []): Exercise | undefined {

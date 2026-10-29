@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LineChart } from '../../components/charts';
 import { ExerciseImage } from '../../components/ExerciseImage';
 import { EmptyState, SectionTitle, Tag } from '../../components/ui';
-import { EQUIPMENT_LABELS, LEVEL_LABELS, MUSCLE_LABELS, setLabels } from '../../data/exercises';
+import { EQUIPMENT_LABELS, fetchInstructions, LEVEL_LABELS, MUSCLE_LABELS, setLabels } from '../../data/exercises';
 import { formatShort } from '../../lib/date';
 import { bestSet, exerciseHistory, formatKg, personalRecord } from '../../lib/stats';
 import { useStore } from '../../store/store';
@@ -21,6 +21,18 @@ export default function ExerciseDetail() {
   const { get } = useExercises();
   const ex = get(id);
   const [showSteps, setShowSteps] = useState(false);
+  const [steps, setSteps] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!ex) return;
+    let cancelled = false;
+    fetchInstructions(ex)
+      .then((s) => !cancelled && setSteps(s))
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [ex]);
 
   const pr = useMemo(() => personalRecord(state.workouts, id), [state.workouts, id]);
   const history = useMemo(() => exerciseHistory(state.workouts, id), [state.workouts, id]);
@@ -108,7 +120,7 @@ export default function ExerciseDetail() {
             </>
           )}
 
-          {ex.ins.length > 0 && (
+          {steps.length > 0 && (
             <>
               <SectionTitle
                 right={
@@ -119,7 +131,7 @@ export default function ExerciseDetail() {
               >
                 Ausführung
               </SectionTitle>
-              {(showSteps ? ex.ins : ex.ins.slice(0, 1)).map((step, i) => (
+              {(showSteps ? steps : steps.slice(0, 1)).map((step, i) => (
                 <View key={i} style={styles.step}>
                   <Text style={styles.stepNum}>{i + 1}</Text>
                   <Text style={styles.stepText}>{step}</Text>

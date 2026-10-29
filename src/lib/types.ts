@@ -11,7 +11,6 @@ export interface Exercise {
   lvl: string;
   /** Anzahl Bilder (0 = kein Bild) */
   img: number;
-  ins: string[];
   /** englischer Originalname (für die Suche) */
   en?: string;
   custom?: boolean;

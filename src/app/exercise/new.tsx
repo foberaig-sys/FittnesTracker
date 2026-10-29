@@ -29,7 +29,6 @@ export default function NewExercise() {
       cat: cardio ? 'cardio' : 'strength',
       lvl: '',
       img: 0,
-      ins: [],
     });
     router.back();
   };

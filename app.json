@@ -28,7 +28,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-image"
+      "expo-image",
+      "expo-font"
     ],
     "scheme": "gymtracker"
   }
