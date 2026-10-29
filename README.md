@@ -1,6 +1,6 @@
 # GymTracker
 
-Ein bewusst simpler Gym-Tracker (Expo / React Native, SDK 55, Expo Router).
+Ein bewusst simpler Gym-Tracker (Expo / React Native, SDK 55).
 
 ## Funktionen
 
